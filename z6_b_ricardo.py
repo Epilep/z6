@@ -1,14 +1,5 @@
 
-# coding: utf-8
-
-# In[1]:
-
-
 import networkx as nx
-
-
-# In[2]:
-
 
 def z6(z, b, soma, w):
     a = -1
@@ -17,10 +8,6 @@ def z6(z, b, soma, w):
     #w = 0.3
     beta = 0.07
     return (a * abs(z) ** 2 + b * abs(z) + c + w*1j) * z + beta*soma
-
-
-# In[71]:
-
 
 def eqb(b, z):
     
@@ -34,10 +21,6 @@ def eqb(b, z):
     
     return bo * ((1 - abs(z) /zo) - b) / tau
     #return 0
-
-
-# In[72]:
-
 
 def rk_z6(g,dt,ac):
     
@@ -75,11 +58,6 @@ def rk_z6(g,dt,ac):
     
     return g
     
-
-
-# In[73]:
-
-
 import random
 import numpy as np
 
@@ -118,22 +96,6 @@ for i in range(int(500/dt)):
         x[node] += [g.node[node]['z'][0].real]
         y[node] += [g.node[node]['z'][0].imag]
     
-#         y[node] += [g.node[node]['zn'].imag]
-#     for (node) in nx.nodes(g):
-#         z_no = g.node[node]['z']
-#         soma = 0
-#         for (u) in nx.all_neighbors(g, node):
-#             soma += g.node[u]['z']
-#         g.node[node]['zn'] = rk_z6(z_no, soma, dt)
-#         x[node] += [g.node[node]['zn'].real]
-#         y[node] += [g.node[node]['zn'].imag]
-        
-#     for (node) in nx.nodes(g):
-#         g.node[node]['z'] = g.node[node]['zn']
-
-
-# In[74]:
-
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -215,24 +177,5 @@ plt.plot(y[1],'r:')
 plt.plot(y[2],'g:')
 plt.plot(y[3],'m:')
 plt.ylim(-2,2)
-plt.show()
-
-
-# In[76]:
-
-
-g.node[0]['b']
-
-
-# In[18]:
-
-
-x = []
-y = []
-for i in range(10000):
-    x += [random.gauss(0,1)]
-    y += [random.gauss(0,1)]
-    
-plt.plot(x,y,'b.', alpha=0.1)
 plt.show()
 
