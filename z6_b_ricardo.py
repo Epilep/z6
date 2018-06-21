@@ -12,14 +12,16 @@ def z6(z, b, soma, w):
 def eqb(b, z):
     
     a = -1
-    bo = 2
+    bo = 5
     c = -0.9
     w = 0.3
+    bth = 2*np.sqrt(a*c)
     
-    tau = 100#2 * np.pi * 100 / 0.3
-    zo = -0.5 * bo * (1 + np.sqrt(1 - 4 * a * c / bo ** 2)) / a
+    tau = 1000#2 * np.pi * 100 / 0.3
+ #   zo = -0.5 * bo * (1 - np.sqrt(1 - 4 * a * c / bo ** 2)) / a
+    zo = -0.5 * bth/ a
     
-    return bo * ((1 - abs(z) /zo) - b) / tau
+    return (bo * (1 - abs(z) /zo) - b) / tau
     #return 0
 
 def rk_z6(g,dt,ac):
@@ -53,7 +55,7 @@ def rk_z6(g,dt,ac):
         #
         # Descomentar a linha abaixo para incluir o ruído
         #
-        g.node[node]['z'][0] = sum(zt) #+ np.sqrt(dt) * (random.gauss(0,1) + random.gauss(0,1)*1j)
+        g.node[node]['z'][0] = sum(zt) + np.sqrt(dt) * (random.gauss(0,.1) + random.gauss(0,.1)*1j)
         g.node[node]['b'][0] = sum(bt)
     
     return g
@@ -70,18 +72,34 @@ while not nx.is_connected(g):
     g = nx.erdos_renyi_graph(n,0.5)
 
 
+a = -1
+bo = 5
+c = -0.9
+w = 0.3
+
+tau = 100#2 * np.pi * 100 / 0.3
+zo = -0.5 * bo * (1 + np.sqrt(1 - 4 * a * c / bo ** 2)) / a
+print(zo)    
+
+
+    
 x = []
 y = []
+b = []
+z = []
 for node in nx.nodes(g):
-    fase = random.uniform(0,2*np.pi)
-    g.node[node]['z'] = [1.5* np.cos(fase) + 1.5 *np.sin(fase) * 1j, 0, 0, 0, 0]
-    #g.node[node]['z'] = [0 + 0*1j, 0, 0, 0, 0]
-    g.node[node]['b'] = [2, 0, 0, 0, 0]
-    g.node[node]['w'] = random.uniform(-0.2, 0.2)
+    #fase = random.uniform(0,2*np.pi)
+    #g.node[node]['z'] = [1.5* np.cos(fase) + 1.5 *np.sin(fase) * 1j, 0, 0, 0, 0]
+    g.node[node]['z'] = [0 + 0*1j, 0, 0, 0, 0]
+    g.node[node]['b'] = [1.9, 0, 0, 0, 0]
+    g.node[node]['w'] = random.uniform(-0.9, 1.1)
     x += [[g.node[node]['z'][0].real]]
     y += [[g.node[node]['z'][0].imag]]
+    b += [[g.node[node]['b'][0]]]
+    z += [[abs(g.node[node]['z'][0])]]
     
-dt = 0.01
+dt = 0.1
+
 
 # ac = [[0, 1, -1, 1], 
 #       [1, 0, 1, -1],
@@ -90,78 +108,20 @@ dt = 0.01
 # ac = n * [n * [1j]]
 ac = 1
 
-for i in range(int(500/dt)):
+for i in range(int(1000/dt)):
     g = rk_z6(g, dt, ac)
+    #print(i * dt)
     for node in nx.nodes(g):
         x[node] += [g.node[node]['z'][0].real]
         y[node] += [g.node[node]['z'][0].imag]
+        b[node] += [g.node[node]['b'][0]]
+        z[node] += [abs(g.node[node]['z'][0])]
     
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 
-get_ipython().run_line_magic('matplotlib', 'notebook')
-
-fig, ax = plt.subplots()
-points = []
-
-#points, = ax.plot(n*[],n*[], 'bo')
-
-for i in range(n):
-    point, = ax.plot([],[], 'bo')
-    points += [ point ]
-
-# point0, = ax.plot([],[], 'bo')
-# point1, = ax.plot([],[], 'ro')
-# point2, = ax.plot([],[], 'go')
-# point3, = ax.plot([],[], 'mo')
-
-plt.xlim(-3,3)
-plt.ylim(-3,3)
-
-def init():
-    for i in range(n):
-        points[i].set_data([], [])
-#     point0.set_data([], [])
-#     point1.set_data([], [])
-#     point2.set_data([], [])
-#     point3.set_data([], [])
-    #return points,
-
-def animate(t):
-    t = t * 1000
-    for i in range(n):
-        points[i].set_data([x[i][t]], [y[i][t]])
-#     point0.set_data([x[0][i]], [y[0][i]])
-#     point1.set_data([x[1][i]], [y[1][i]])
-#     point2.set_data([x[2][i]], [y[2][i]])
-#     point3.set_data([x[3][i]], [y[3][i]])
-    
-    
-anim = animation.FuncAnimation(fig, animate, frames=int(len(x[0]) / 1000), init_func=init, interval=1, blit=True)
-#anim = animation.FuncAnimation(fig, animate, frames=10, init_func=init, interval=1, blit=True)
-
-
-# ani = animation.FuncAnimation(fig, update, generate_points, interval=300)
-#ani.save('animation.gif', writer='imagemagick', fps=24);
-
-# mywriter = animation.FFMpegWriter()
-anim.save('animation.mp4', fps=20, writer="ffmpeg", codec="libx264")
-
-plt.show()
-
-
-# plt.plot(x[0],y[0])
-# plt.plot(x[1],y[1],'r-.')
-# plt.plot(x[2],y[2],'g:',)
-# plt.show()
-
-
-# In[75]:
-
-
-get_ipython().run_line_magic('matplotlib', 'inline')
 
 plt.clf()
 # plt.plot(x[0],y[0],'b:')
@@ -172,10 +132,24 @@ plt.clf()
 # plt.plot(x[1],'r:')
 # plt.plot(x[2],'g:')
 # plt.plot(x[3],'m:')
+
+plt.subplot(3,1,1)
+plt.plot(b[0],'b:')
+plt.plot(b[1],'r:')
+plt.plot(b[2],'g:')
+plt.plot(b[3],'m:')
+#plt.ylim(-2,2)
+
+plt.subplot(3,1,2)
 plt.plot(y[0],'b:')
 plt.plot(y[1],'r:')
 plt.plot(y[2],'g:')
 plt.plot(y[3],'m:')
-plt.ylim(-2,2)
+
+plt.subplot(3,1,3)
+plt.plot(z[0],'b:')
+plt.plot(z[1],'r:')
+plt.plot(z[2],'g:')
+plt.plot(z[3],'m:')
 plt.show()
 
