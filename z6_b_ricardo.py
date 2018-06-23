@@ -7,7 +7,7 @@ def z6(z, b, soma, w):
     c = -0.9
     #w = 0.3
     beta = 0.07
-    return (a * abs(z) ** 2 + b * abs(z) + c + w*1j) * z + beta*soma
+    return (a * abs(z) ** 4 + b * abs(z) ** 2 + c + w*1j) * z + beta*soma
 
 def eqb(b, z):
     
